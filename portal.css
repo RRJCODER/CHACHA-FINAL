@@ -1,0 +1,261 @@
+{% extends "layout.html" %}
+{% block titulo %}Resumen y filtros{% endblock %}
+
+{% block contenido %}
+<section class="panel">
+    <div class="panel-head">
+        <div>
+            <h3>Filtros</h3>
+            <p class="subtext">Filtra por trabajador, obra, día concreto, mes o año.</p>
+        </div>
+        <a href="{{ url_for('resumen') }}">Limpiar filtros</a>
+    </div>
+
+    <form method="get" class="form-grid form-grid-large">
+        <div>
+            <label>Trabajador</label>
+            <select name="trabajador_id">
+                <option value="">Todos los trabajadores</option>
+                {% for t in lista_trabajadores %}
+                <option value="{{ t.id }}" {% if filtros.trabajador_id|string == t.id|string %}selected{% endif %}>{{ t.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label>Obra</label>
+            <select name="obra_id">
+                <option value="">Todas las obras</option>
+                {% for o in lista_obras %}
+                <option value="{{ o.id }}" {% if filtros.obra_id|string == o.id|string %}selected{% endif %}>{{ o.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label>Día concreto</label>
+            <input type="date" name="fecha" value="{{ filtros.fecha }}">
+        </div>
+
+        <div>
+            <label>Mes</label>
+            <select name="mes">
+                <option value="">Todos los meses</option>
+                <option value="01" {% if filtros.mes == "01" %}selected{% endif %}>Enero</option>
+                <option value="02" {% if filtros.mes == "02" %}selected{% endif %}>Febrero</option>
+                <option value="03" {% if filtros.mes == "03" %}selected{% endif %}>Marzo</option>
+                <option value="04" {% if filtros.mes == "04" %}selected{% endif %}>Abril</option>
+                <option value="05" {% if filtros.mes == "05" %}selected{% endif %}>Mayo</option>
+                <option value="06" {% if filtros.mes == "06" %}selected{% endif %}>Junio</option>
+                <option value="07" {% if filtros.mes == "07" %}selected{% endif %}>Julio</option>
+                <option value="08" {% if filtros.mes == "08" %}selected{% endif %}>Agosto</option>
+                <option value="09" {% if filtros.mes == "09" %}selected{% endif %}>Septiembre</option>
+                <option value="10" {% if filtros.mes == "10" %}selected{% endif %}>Octubre</option>
+                <option value="11" {% if filtros.mes == "11" %}selected{% endif %}>Noviembre</option>
+                <option value="12" {% if filtros.mes == "12" %}selected{% endif %}>Diciembre</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Año</label>
+            <input type="number" name="anio" placeholder="Ej. 2026" value="{{ filtros.anio }}">
+        </div>
+
+        <button type="submit">Aplicar filtros</button>
+    </form>
+</section>
+
+<section class="stats-grid">
+    <div class="stat-card">
+        <span>Registros</span>
+        <strong>{{ totales.total_registros }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Horas trabajadas</span>
+        <strong>{{ "%.2f"|format(totales.total_horas) }}</strong>
+    </div>
+    <div class="stat-card accent">
+        <span>Horas extra</span>
+        <strong>{{ "%.2f"|format(totales.total_horas_extra) }}</strong>
+    </div>
+    <div class="stat-card money">
+        <span>Importe extras</span>
+        <strong>{{ "%.2f"|format(totales.total_extras) }} €</strong>
+    </div>
+</section>
+
+<section class="stats-grid small-gap">
+    <div class="stat-card soft">
+        <span>Adelantado</span>
+        <strong>{{ "%.2f"|format(totales.total_adelantado) }} €</strong>
+    </div>
+    <div class="stat-card ok-card">
+        <span>Liquidado / pagado</span>
+        <strong>{{ "%.2f"|format(totales.total_liquidado) }} €</strong>
+    </div>
+    <div class="stat-card money">
+        <span>Pendiente extras</span>
+        <strong>{{ "%.2f"|format(totales.total_pendiente) }} €</strong>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="panel-head"><h3>Resumen por trabajador</h3></div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Trabajador</th>
+                    <th>Horas trabajadas</th>
+                    <th>Horas extra</th>
+                    <th>€/h extra</th>
+                    <th>Importe extras</th>
+                    <th>Adelantado</th>
+                    <th>Liquidado</th>
+                    <th>Pendiente</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in trabajadores %}
+                <tr>
+                    <td><strong>{{ t.trabajador }}</strong></td>
+                    <td>{{ "%.2f"|format(t.horas) }}</td>
+                    <td><strong>{{ "%.2f"|format(t.horas_extra) }}</strong></td>
+                    <td>{{ "%.2f"|format(t.precio_hora) }} €</td>
+                    <td>{{ "%.2f"|format(t.extras) }} €</td>
+                    <td>{{ "%.2f"|format(t.adelantado) }} €</td>
+                    <td><span class="badge paid">{{ "%.2f"|format(t.liquidado_importe) }} €</span></td>
+                    <td><strong>{{ "%.2f"|format(t.pendiente) }} €</strong></td>
+                    <td>
+                        {% if t.pendiente > 0 %}
+                        <form method="post" action="{{ url_for('liquidar_trabajador', id=t.trabajador_id) }}" class="inline-form" onsubmit="return confirm('¿Marcar como pagados los extras pendientes de {{ t.trabajador }} dentro de estos filtros?')">
+                            <input type="hidden" name="trabajador_id" value="{{ filtros.trabajador_id }}">
+                            <input type="hidden" name="obra_id" value="{{ filtros.obra_id }}">
+                            <input type="hidden" name="fecha" value="{{ filtros.fecha }}">
+                            <input type="hidden" name="mes" value="{{ filtros.mes }}">
+                            <input type="hidden" name="anio" value="{{ filtros.anio }}">
+                            <button type="submit" class="mini-btn">✓ Liquidar</button>
+                        </form>
+                        {% else %}
+                        <span class="badge paid">Pagado</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="9">No hay datos con los filtros seleccionados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="panel-head"><h3>Resumen por obra</h3></div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Obra</th>
+                    <th>Cliente</th>
+                    <th>Horas trabajadas</th>
+                    <th>Horas extra</th>
+                    <th>Importe extras</th>
+                    <th>Adelantos</th>
+                    <th>Liquidado</th>
+                    <th>Pendiente</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in obras %}
+                <tr>
+                    <td><strong>{{ o.obra }}</strong></td>
+                    <td>{{ o.cliente }}</td>
+                    <td>{{ "%.2f"|format(o.horas) }}</td>
+                    <td><strong>{{ "%.2f"|format(o.horas_extra) }}</strong></td>
+                    <td>{{ "%.2f"|format(o.extras) }} €</td>
+                    <td>{{ "%.2f"|format(o.adelantado) }} €</td>
+                    <td><span class="badge paid">{{ "%.2f"|format(o.liquidado_importe) }} €</span></td>
+                    <td><strong>{{ "%.2f"|format(o.pendiente) }} €</strong></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8">No hay datos con los filtros seleccionados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="panel-head"><h3>Detalle de registros filtrados</h3></div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Trabajador</th>
+                    <th>Obra</th>
+                    <th>Cliente</th>
+                    <th>Horas trabajadas</th>
+                    <th>Horas extra</th>
+                    <th>€/h extra</th>
+                    <th>Importe extra</th>
+                    <th>Adelanto</th>
+                    <th>Pendiente</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                    <th>Observaciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in registros %}
+                <tr>
+                    <td>{{ r.fecha }}</td>
+                    <td><strong>{{ r.trabajador }}</strong></td>
+                    <td>{{ r.obra }}</td>
+                    <td>{{ r.cliente }}</td>
+                    <td>{{ "%.2f"|format(r.horas) }}</td>
+                    <td><strong>{{ "%.2f"|format(r.horas_extra) }}</strong></td>
+                    <td>{{ "%.2f"|format(r.precio_hora) }} €</td>
+                    <td>{{ "%.2f"|format(r.importe_extra) }} €</td>
+                    <td>{{ "%.2f"|format(r.dinero_adelantado) }} €</td>
+                    <td><strong>{{ "%.2f"|format(r.pendiente) }} €</strong></td>
+                    <td>
+                        {% if r.liquidado %}
+                            <span class="badge paid">✓ Pagado</span>
+                            <small>{{ r.fecha_liquidacion }}</small>
+                        {% else %}
+                            <span class="badge pending">Pendiente</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if r.liquidado %}
+                        <form method="post" action="{{ url_for('desliquidar_registro_resumen', id=r.id) }}" class="inline-form">
+                            <input type="hidden" name="trabajador_id" value="{{ filtros.trabajador_id }}">
+                            <input type="hidden" name="obra_id" value="{{ filtros.obra_id }}">
+                            <input type="hidden" name="fecha" value="{{ filtros.fecha }}">
+                            <input type="hidden" name="mes" value="{{ filtros.mes }}">
+                            <input type="hidden" name="anio" value="{{ filtros.anio }}">
+                            <button type="submit" class="mini-btn secondary">Desmarcar</button>
+                        </form>
+                        {% else %}
+                        <form method="post" action="{{ url_for('liquidar_registro_resumen', id=r.id) }}" class="inline-form">
+                            <input type="hidden" name="trabajador_id" value="{{ filtros.trabajador_id }}">
+                            <input type="hidden" name="obra_id" value="{{ filtros.obra_id }}">
+                            <input type="hidden" name="fecha" value="{{ filtros.fecha }}">
+                            <input type="hidden" name="mes" value="{{ filtros.mes }}">
+                            <input type="hidden" name="anio" value="{{ filtros.anio }}">
+                            <button type="submit" class="mini-btn">✓ Pagado</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                    <td>{{ r.observaciones }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="13">No hay registros con los filtros seleccionados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

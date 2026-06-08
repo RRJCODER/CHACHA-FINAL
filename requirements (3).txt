@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Control de horas | Construcciones Chacha</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-card">
+                    <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Construcciones Chacha">
+                </div>
+                <div>
+                    <h1>Construcciones<br>Chacha</h1>
+                    <p>Control de horas y extras</p>
+                </div>
+            </div>
+
+            <nav class="menu">
+                <a href="{{ url_for('index') }}">Inicio</a>
+                <a href="{{ url_for('trabajadores') }}">Trabajadores</a>
+                <a href="{{ url_for('obras') }}">Obras</a>
+                <a href="{{ url_for('horas') }}">Registrar horas</a>
+                <a href="{{ url_for('resumen') }}">Resumen</a>
+                <a href="{{ url_for('guardar_backup') }}" onclick="return confirm('¿Crear una copia de seguridad ahora?')">Guardar copia</a>
+                <a class="exit-link" href="{{ url_for('salir') }}" onclick="return confirm('Se creará una copia de seguridad y se cerrará la aplicación. ¿Continuar?')">Salir seguro</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <strong>616 925 364</strong>
+                <span>construccioneschacha@gmail.com</span>
+                <small>Guadalén, Vilches</small>
+            </div>
+        </aside>
+
+        <section class="content">
+            <header class="topbar">
+                <div>
+                    <span class="eyebrow">Panel profesional</span>
+                    <h2>{% block titulo %}Control de horas{% endblock %}</h2>
+                </div>
+                <a class="top-action" href="{{ url_for('horas') }}">+ Nuevo registro</a>
+            </header>
+
+            <main>
+                {% with mensajes = get_flashed_messages(with_categories=true) %}
+                {% if mensajes %}
+                <div class="flash-wrap">
+                    {% for categoria, mensaje in mensajes %}
+                    <div class="flash {{ categoria }}">{{ mensaje }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+                {% block contenido %}{% endblock %}
+            </main>
+        </section>
+    </div>
+<script>
+(function () {
+    let formularioModificado = false;
+    document.querySelectorAll('form input, form select, form textarea').forEach(function (campo) {
+        campo.addEventListener('input', function () { formularioModificado = true; });
+        campo.addEventListener('change', function () { formularioModificado = true; });
+    });
+    document.querySelectorAll('form').forEach(function (form) {
+        form.addEventListener('submit', function () { formularioModificado = false; });
+    });
+    window.addEventListener('beforeunload', function (e) {
+        if (formularioModificado) {
+            e.preventDefault();
+            e.returnValue = 'Tienes cambios sin guardar. ¿Quieres salir sin guardar?';
+        }
+    });
+})();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

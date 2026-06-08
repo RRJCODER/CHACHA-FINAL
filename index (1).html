@@ -1,0 +1,28 @@
+@echo off
+:: ============================================================
+::  Crea acceso directo de ChachaObras en el Escritorio
+:: ============================================================
+
+set "SCRIPT_DIR=%~dp0"
+set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
+set "DESKTOP=%USERPROFILE%\Desktop"
+set "SHORTCUT=%DESKTOP%\Chacha Obras.lnk"
+
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$ws = New-Object -ComObject WScript.Shell;" ^
+  "$s = $ws.CreateShortcut('%SHORTCUT%');" ^
+  "$s.TargetPath = '%SCRIPT_DIR%\iniciar.bat';" ^
+  "$s.WorkingDirectory = '%SCRIPT_DIR%';" ^
+  "$s.WindowStyle = 7;" ^
+  "$s.Description = 'Construcciones y Reformas Chacha S.L.';" ^
+  "$s.Save();"
+
+if exist "%SHORTCUT%" (
+    echo.
+    echo  OK - Acceso directo creado en el Escritorio
+    echo  Doble clic en "Chacha Obras" para arrancar
+    echo.
+) else (
+    echo  ERROR al crear el acceso directo
+)
+pause

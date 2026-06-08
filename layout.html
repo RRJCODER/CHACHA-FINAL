@@ -1,0 +1,7 @@
+@echo off
+echo Deteniendo servidor...
+taskkill /f /im pythonw.exe >nul 2>&1
+taskkill /f /im python.exe >nul 2>&1
+timeout /t 2 >nul
+echo Listo. Ya puedes borrar o reemplazar la carpeta.
+pause

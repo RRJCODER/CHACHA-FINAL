@@ -1,0 +1,37 @@
+@echo off
+cd /d "%~dp0"
+set "VENV_DIR=%~dp0.venv"
+
+call "%~dp0CERRAR_TODO.bat" >nul 2>nul
+
+where py >nul 2>nul
+if errorlevel 1 (
+    set "PY_CMD=python"
+) else (
+    set "PY_CMD=py"
+)
+
+if not exist "%VENV_DIR%\Scripts\python.exe" (
+    echo Primera preparacion de la aplicacion...
+    echo Creando entorno interno de Python...
+    %PY_CMD% -m venv "%VENV_DIR%"
+    if errorlevel 1 (
+        echo.
+        echo ERROR: No se ha podido crear el entorno interno.
+        echo Instala Python y marca la opcion Add Python to PATH.
+        pause
+        exit /b 1
+    )
+    echo Instalando Flask...
+    "%VENV_DIR%\Scripts\python.exe" -m pip install -r requirements.txt
+    if errorlevel 1 (
+        echo.
+        echo ERROR: No se ha podido instalar Flask.
+        echo Revisa que tengas internet la primera vez.
+        pause
+        exit /b 1
+    )
+)
+
+start "Control Horario Chacha" "%VENV_DIR%\Scripts\pythonw.exe" "%~dp0app.py"
+exit

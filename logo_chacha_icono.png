@@ -1,0 +1,33 @@
+CONTROL HORARIO CHACHA - VERSION HORAS EXTRA MANUALES
+
+Cambios principales:
+
+1. Las horas trabajadas se introducen manualmente.
+   Sirven para controlar la jornada diaria real del trabajador.
+
+2. Las horas extra se introducen manualmente en una casilla aparte.
+   Son las unicas horas que se cuantifican para pago.
+
+3. El importe se calcula asi:
+   HORAS EXTRA x PRECIO HORA EXTRA del trabajador.
+
+4. La app ya no calcula horas extra automaticamente a partir de 8 horas.
+   Ejemplo: puedes poner 10 horas trabajadas y 2 horas extra, o 9 horas trabajadas y 1 hora extra.
+
+5. Cierre reforzado:
+   - El boton Salir seguro crea copia final y cierra el proceso Python.
+   - ABRIR_APLICACION.bat limpia cualquier proceso anterior en el puerto 8000 antes de abrir.
+   - Se incluye CERRAR_TODO.bat para cerrar manualmente si Windows deja algo abierto.
+
+Uso recomendado:
+- Abrir siempre con ABRIR_APLICACION.bat.
+- Cerrar siempre desde el boton Salir seguro.
+- Si alguna vez queda algo bloqueado, ejecutar CERRAR_TODO.bat y volver a abrir.
+
+
+NOVEDAD - LIQUIDACION DE EXTRAS
+- En Resumen ahora aparece Liquidado / Pagado.
+- Puedes marcar como pagado un registro concreto desde el detalle.
+- Puedes liquidar de golpe los extras pendientes de un trabajador dentro de los filtros aplicados.
+- Si te equivocas, puedes desmarcar un registro y volverlo a dejar como pendiente.
+- El importe pendiente ya no cuenta los registros marcados como pagados.

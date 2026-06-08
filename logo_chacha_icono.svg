@@ -1,0 +1,18 @@
+@echo off
+cd /d "%~dp0"
+echo Cerrando procesos anteriores de Control Horario Chacha...
+
+if exist "%~dp0app.pid" (
+    set /p APP_PID=<"%~dp0app.pid"
+    if not "%APP_PID%"=="" (
+        taskkill /PID %APP_PID% /F >nul 2>nul
+    )
+    del "%~dp0app.pid" >nul 2>nul
+)
+
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8000" ^| findstr "LISTENING"') do (
+    taskkill /PID %%a /F >nul 2>nul
+)
+
+del "%~dp0*.pyc" >nul 2>nul
+echo Cierre completado.

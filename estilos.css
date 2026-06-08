@@ -1,0 +1,25 @@
+@echo off
+echo ====================================================
+echo  CHACHA OBRAS  -  Generando ejecutable .exe
+echo ====================================================
+
+pip install -r requirements.txt
+
+pyinstaller ^
+  --onefile ^
+  --windowed ^
+  --name "ChachaObras" ^
+  --add-data "static;static" ^
+  --hidden-import "flask" ^
+  --hidden-import "flask.templating" ^
+  --hidden-import "jinja2" ^
+  --hidden-import "werkzeug" ^
+  --hidden-import "reportlab.graphics" ^
+  --hidden-import "reportlab.platypus" ^
+  --collect-all flask ^
+  server.py
+
+echo.
+echo === dist/ChachaObras.exe listo ===
+echo Copia junto al exe la carpeta static/ y backups/
+pause

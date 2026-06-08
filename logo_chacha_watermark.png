@@ -1,0 +1,39 @@
+@echo off
+cd /d "%~dp0"
+set "VENV_DIR=%~dp0.venv"
+
+call "%~dp0CERRAR_TODO.bat" >nul 2>nul
+
+where py >nul 2>nul
+if errorlevel 1 (
+    set "PY_CMD=python"
+) else (
+    set "PY_CMD=py"
+)
+
+echo Preparando la aplicacion...
+if not exist "%VENV_DIR%\Scripts\python.exe" (
+    echo Creando entorno interno de Python...
+    %PY_CMD% -m venv "%VENV_DIR%"
+    if errorlevel 1 (
+        echo.
+        echo ERROR: No se ha podido crear el entorno interno.
+        echo Instala Python marcando la opcion Add Python to PATH.
+        pause
+        exit /b 1
+    )
+)
+
+echo Instalando dependencias necesarias...
+"%VENV_DIR%\Scripts\python.exe" -m pip install -r requirements.txt
+if errorlevel 1 (
+    echo.
+    echo ERROR: No se han podido instalar las dependencias.
+    echo Revisa que tengas internet o ejecuta este archivo como administrador.
+    pause
+    exit /b 1
+)
+
+echo Abriendo Control Horario Chacha...
+"%VENV_DIR%\Scripts\python.exe" app.py
+pause
