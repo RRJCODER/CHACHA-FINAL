@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+{% block titulo %}Obras{% endblock %}
+
+{% block contenido %}
+<section class="panel">
+    <div class="panel-head">
+        <h3>Nueva obra</h3>
+    </div>
+
+    <form method="post" class="form-grid">
+        <div>
+            <label>Nombre de la obra</label>
+            <input type="text" name="nombre" placeholder="Ej. Reforma cocina" required>
+        </div>
+        <div>
+            <label>Cliente</label>
+            <input type="text" name="cliente" placeholder="Ej. Manuel García">
+        </div>
+        <div>
+            <label>Dirección</label>
+            <input type="text" name="direccion" placeholder="Dirección de la obra">
+        </div>
+        <button type="submit">Guardar obra</button>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="panel-head">
+        <h3>Listado de obras</h3>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Obra</th>
+                    <th>Cliente</th>
+                    <th>Dirección</th>
+                    <th>Horas trabajadas</th>
+                    <th>Horas extra</th>
+                    <th>Importe extras</th>
+                    <th>Adelantos</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in obras %}
+                <tr>
+                    <td><strong>{{ o.nombre }}</strong></td>
+                    <td>{{ o.cliente }}</td>
+                    <td>{{ o.direccion }}</td>
+                    <td>{{ "%.2f"|format(o.total_horas) }}</td>
+                    <td><strong>{{ "%.2f"|format(o.horas_extra) }}</strong></td>
+                    <td>{{ "%.2f"|format(o.extras) }} €</td>
+                    <td>{{ "%.2f"|format(o.adelantado) }} €</td>
+                    <td class="actions">
+                        <a href="{{ url_for('editar_obra', id=o.id) }}">Editar</a>
+                        <a class="danger" onclick="return confirm('¿Borrar obra?')" href="{{ url_for('borrar_obra', id=o.id) }}">Borrar</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8">No hay obras creadas.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

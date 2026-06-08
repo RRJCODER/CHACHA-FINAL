@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+{% block titulo %}Resumen general{% endblock %}
+
+{% block contenido %}
+<section class="hero">
+    <div>
+        <span class="badge">Horas trabajadas + horas extra</span>
+        <h3>Controla la jornada real y paga solo las horas extra indicadas.</h3>
+        <p>Las horas trabajadas se guardan para control interno. Las horas extra se introducen aparte y son las únicas que se cuantifican económicamente.</p>
+    </div>
+    <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Logo">
+</section>
+
+<section class="stats-grid">
+    <div class="stat-card">
+        <span>Trabajadores activos</span>
+        <strong>{{ total_trabajadores }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Obras activas</span>
+        <strong>{{ total_obras }}</strong>
+    </div>
+    <div class="stat-card">
+        <span>Horas trabajadas</span>
+        <strong>{{ "%.2f"|format(total_horas) }}</strong>
+    </div>
+    <div class="stat-card accent">
+        <span>Horas extra</span>
+        <strong>{{ "%.2f"|format(total_horas_extra) }}</strong>
+    </div>
+</section>
+
+<section class="stats-grid small-gap">
+    <div class="stat-card money">
+        <span>Importe horas extra</span>
+        <strong>{{ "%.2f"|format(total_extras) }} €</strong>
+    </div>
+    <div class="stat-card soft">
+        <span>Adelantos</span>
+        <strong>{{ "%.2f"|format(total_adelantos) }} €</strong>
+    </div>
+    <div class="stat-card money">
+        <span>Pendiente extras</span>
+        <strong>{{ "%.2f"|format(total_pendiente) }} €</strong>
+    </div>
+</section>
+
+<div class="grid-2">
+    <section class="panel">
+        <div class="panel-head">
+            <h3>Últimos registros</h3>
+            <a href="{{ url_for('horas') }}">Ver todos</a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Trabajador</th>
+                        <th>Obra</th>
+                        <th>Horas trabajadas</th>
+                        <th>Horas extra</th>
+                        <th>Importe extra</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in ultimos_registros %}
+                    <tr>
+                        <td>{{ r.fecha }}</td>
+                        <td><strong>{{ r.trabajador }}</strong></td>
+                        <td>{{ r.obra }}</td>
+                        <td>{{ "%.2f"|format(r.horas) }}</td>
+                        <td><strong>{{ "%.2f"|format(r.horas_extra) }}</strong></td>
+                        <td>{{ "%.2f"|format(r.importe_extra) }} €</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6">Aún no hay jornadas registradas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-head">
+            <h3>Extras por trabajador</h3>
+            <a href="{{ url_for('resumen') }}">Resumen</a>
+        </div>
+        <div class="worker-list">
+            {% for r in resumen_trabajadores %}
+            <div class="worker-item">
+                <div>
+                    <strong>{{ r.nombre }}</strong>
+                    <span>{{ "%.2f"|format(r.horas) }} h trabajadas · {{ "%.2f"|format(r.horas_extra) }} h extra</span>
+                </div>
+                <b>{{ "%.2f"|format(r.pendiente) }} €</b>
+            </div>
+            {% else %}
+            <p class="empty">Aún no hay trabajadores.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}
